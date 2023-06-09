@@ -31,6 +31,12 @@ app.post("/subscribe", async (req, res) => {
       .end(function (resp) {
         if (resp.error) throw new Error(resp.error);
         console.log({ resp });
+        let message = "success";
+        if (resp.body === "1") {
+          message = "Suscribed successfully";
+        } else {
+          message = resp.body;
+        }
         res.status(resp.status).json({ data: resp.body });
       });
 
