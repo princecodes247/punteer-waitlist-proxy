@@ -1,26 +1,34 @@
 const express = require("express");
-const exec = require("child_process").exec;
+const axios = require("axios");
+const cors = require("cors");
+
 const app = express();
-app.get("/", (req, res) => {
-  console.log("Just got a request!");
-  res.send("Yo!");
-});
+const port = 3000;
 
-app.post("/send", (req, res) => {
-  var args = ` -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "api_key=fNVWjgj4YChkkDwKGCad&list=6KNZZ3SCb41cOUwVmJFAag&name=Prince%20Codes&email=princecodes247%40gmail.com&boolean=true" -v -i -w "Response Code: %{response_code} %{response_body}" https://mailer.punteer.com/sender/subscribe`;
+app.use(express.json());
+app.use(cors()); // Enable CORS for all routes
 
-  exec("curl " + args, function (error, stdout, stderr) {
-    console.log("stdout: " + stdout);
-    console.log("stderr: " + stderr);
-    if (error !== null) {
-      console.log("exec error: " + error);
-    }
-    res.send({
-      stdout: stdout,
-      error: error,
-      bo: "TYO",
+app.all("/*", async (req, res) => {
+  try {
+    const targetUrl = "https://mailer.punteer.com/" + req.url;
+    const response = await axios({
+      method: req.method,
+      url: targetUrl,
+      headers: req.headers,
+      data: req.body,
     });
-  });
+
+    // Forward the response headers
+    Object.keys(response.headers).forEach((key) => {
+      res.setHeader(key, response.headers[key]);
+    });
+
+    res.status(response.status).send(response.data);
+  } catch (error) {
+    res.status(500).send("Error proxying the request");
+  }
 });
 
-app.listen(process.env.PORT || 3005, () => console.log("Server is running..."));
+app.listen(port, () => {
+  console.log(`Proxy server is running on port ${port}`);
+});
