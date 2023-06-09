@@ -33,7 +33,7 @@ app.post("/subscribe", async (req, res) => {
         console.log({ resp });
         let message = "success";
         if (resp.body === "1") {
-          message = "Suscribed successfully";
+          message = "You have been added to our waitlist.";
         } else {
           message = resp.body;
         }
