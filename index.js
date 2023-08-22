@@ -100,7 +100,7 @@ app.post('/convert-to-base64', upload.single('file'), (req, res) => {
   const fileBuffer = req.file.buffer;
   const base64Data = fileBuffer.toString('base64');
 
-  res.json({ base64Data });
+  res.json({ data: base64Data });
 });
 
 app.listen(port, () => {
