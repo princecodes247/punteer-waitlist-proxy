@@ -1,5 +1,6 @@
 const express = require("express");
 var unirest = require("unirest");
+const multer = require('multer');
 const cors = require("cors");
 require("dotenv").config();
 
@@ -85,6 +86,21 @@ app.get("/count", async (req, res) => {
     console.log({ error });
     res.status(500).send("Error proxying the request");
   }
+});
+
+// Set up multer for handling multipart/form-data
+const storage = multer.memoryStorage(); // Store file in memory
+const upload = multer({ storage: storage });
+
+app.post('/convert-to-base64', upload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+
+  const fileBuffer = req.file.buffer;
+  const base64Data = fileBuffer.toString('base64');
+
+  res.json({ base64Data });
 });
 
 app.listen(port, () => {
